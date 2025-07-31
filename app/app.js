@@ -123,8 +123,7 @@ if (ratingForm) {
     
     const campus = campusSelect.value;
     const service = serviceSelect.value;
-    const ratingInput = document.querySelector('input[name="rating"]:checked');
-    const rating = ratingInput ? parseInt(ratingInput.value) : 0;
+    const rating = parseFloat(document.getElementById('ratingInput').value) || 0;
     const comment = commentInput.value.trim() || "No comment provided";
 
     console.log('Form submission:', { campus, service, rating, comment });
@@ -135,8 +134,8 @@ if (ratingForm) {
       return;
     }
 
-    if (rating < 1 || rating > 5) {
-      showMessage('Please select a rating between 1 and 5 stars', 'error');
+    if (rating < 0.5 || rating > 5) {
+      showMessage('Please select a rating between 0.5 and 5 stars', 'error');
       return;
     }
 
@@ -197,7 +196,7 @@ try {
         testRatings.slice(0, 5).forEach(rating => {
           const li = document.createElement('li');
           li.className = 'list-group-item';
-          const stars = '⭐'.repeat(rating.rating);
+          const stars = getStarDisplay(rating.rating);
           const date = new Date(rating.timestamp).toLocaleDateString();
           
           li.innerHTML = `
@@ -222,7 +221,7 @@ try {
       const li = document.createElement('li');
       li.className = 'list-group-item';
       
-      const stars = '⭐'.repeat(data.rating);
+      const stars = getStarDisplay(data.rating);
       const date = new Date(data.timestamp.toDate()).toLocaleDateString();
       
       li.innerHTML = `
@@ -244,7 +243,7 @@ try {
       testRatings.slice(0, 5).forEach(rating => {
         const li = document.createElement('li');
         li.className = 'list-group-item';
-        const stars = '⭐'.repeat(rating.rating);
+        const stars = getStarDisplay(rating.rating);
         const date = new Date(rating.timestamp).toLocaleDateString();
         
         li.innerHTML = `
@@ -270,7 +269,7 @@ try {
     testRatings.slice(0, 5).forEach(rating => {
       const li = document.createElement('li');
       li.className = 'list-group-item';
-      const stars = '⭐'.repeat(rating.rating);
+      const stars = getStarDisplay(rating.rating);
       const date = new Date(rating.timestamp).toLocaleDateString();
       
       li.innerHTML = `
@@ -301,6 +300,9 @@ window.addEventListener('DOMContentLoaded', () => {
   console.log('DOM Content Loaded');
   updateServices();
   
+  // Initialize star rating system
+  initializeStarRating();
+  
   // Add loading spinner if it doesn't exist
   if (!loadingSpinner) {
     const spinner = document.createElement('div');
@@ -312,3 +314,82 @@ window.addEventListener('DOMContentLoaded', () => {
   
   console.log('Initialization complete');
 });
+
+// Initialize interactive star rating system
+function initializeStarRating() {
+  const stars = document.querySelectorAll('.star');
+  const ratingInput = document.getElementById('ratingInput');
+  const ratingValue = document.getElementById('ratingValue');
+  
+  let currentRating = 0;
+  
+  stars.forEach((star, index) => {
+    // Click event with half-star detection
+    star.addEventListener('click', (e) => {
+      const rect = star.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const starWidth = rect.width;
+      
+      // Determine if click is on left (half star) or right (full star) side
+      const isHalfStar = clickX < starWidth / 2;
+      const baseRating = index + 1; // 1, 2, 3, 4, 5
+      const rating = isHalfStar ? baseRating - 0.5 : baseRating;
+      
+      currentRating = rating;
+      updateStarDisplay(rating);
+      ratingInput.value = rating;
+      ratingValue.textContent = rating.toFixed(1);
+    });
+    
+    // Hover events for preview
+    star.addEventListener('mouseenter', (e) => {
+      const rect = star.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const starWidth = rect.width;
+      
+      const isHalfStar = mouseX < starWidth / 2;
+      const baseRating = index + 1; // 1, 2, 3, 4, 5
+      const rating = isHalfStar ? baseRating - 0.5 : baseRating;
+      
+      updateStarDisplay(rating, true);
+    });
+    
+    star.addEventListener('mouseleave', () => {
+      updateStarDisplay(currentRating, false);
+    });
+  });
+}
+
+// Update star display
+function updateStarDisplay(rating, isPreview = false) {
+  const stars = document.querySelectorAll('.star');
+  
+  stars.forEach((star, index) => {
+    const starNumber = index + 1; // 1, 2, 3, 4, 5
+    star.classList.remove('active', 'half-active');
+    
+    if (rating >= starNumber) {
+      // Full star
+      star.classList.add('active');
+    } else if (rating >= starNumber - 0.5) {
+      // Half star
+      star.classList.add('half-active');
+    }
+    // If rating < starNumber - 0.5, star remains gray (default)
+  });
+  
+  // Update display text
+  const ratingValue = document.getElementById('ratingValue');
+  if (!isPreview) {
+    ratingValue.textContent = rating.toFixed(1);
+  }
+}
+
+// Get star display string for ratings
+function getStarDisplay(rating) {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  
+  return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+}

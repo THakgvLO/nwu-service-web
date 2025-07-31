@@ -41,18 +41,19 @@
         <div class="form-group">
           <label for="ratingInput">Rating:</label>
           <div class="star-rating">
-            <input type="radio" id="star1" name="rating" value="1" required>
-            <label for="star1">1</label>
-            <input type="radio" id="star2" name="rating" value="2">
-            <label for="star2">2</label>
-            <input type="radio" id="star3" name="rating" value="3">
-            <label for="star3">3</label>
-            <input type="radio" id="star4" name="rating" value="4">
-            <label for="star4">4</label>
-            <input type="radio" id="star5" name="rating" value="5">
-            <label for="star5">5</label>
+            <div class="stars">
+              <span class="star">☆</span>
+              <span class="star">☆</span>
+              <span class="star">☆</span>
+              <span class="star">☆</span>
+              <span class="star">☆</span>
+            </div>
+            <input type="hidden" id="ratingInput" name="rating" value="" required>
+            <div class="rating-display">
+              <span id="ratingValue">0.0</span> / 5.0
+            </div>
           </div>
-          <small>1 = Poor, 5 = Excellent</small>
+          <small>Click on stars to rate. Half stars are supported.</small>
         </div>
         
         <div class="form-group">
