@@ -1,0 +1,478 @@
+/* NWU Purple & White Theme */
+:root {
+  --nwu-purple: #4B286D;
+  --nwu-white: #fff;
+  --nwu-gold: #FFD100;
+  --light-purple: #f8f6fa;
+  --border-color: #e0d8e8;
+  --success-green: #d4edda;
+  --error-red: #f8d7da;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--nwu-white);
+  color: var(--nwu-purple);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(135deg, var(--nwu-purple) 0%, #6a4c8a 100%);
+  color: var(--nwu-white);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(75, 40, 109, 0.3);
+}
+
+header h1 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 2rem;
+}
+
+.header-buttons {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nwu-btn {
+  background: var(--nwu-gold);
+  color: var(--nwu-purple);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.nwu-btn:hover {
+  background: var(--nwu-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.home-btn {
+  background: var(--nwu-gold);
+  color: var(--nwu-purple);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.home-btn:hover {
+  background: var(--nwu-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.rating-section, .reviews-section {
+  background: var(--nwu-white);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(75, 40, 109, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+.section-description {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.rating-form {
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--nwu-purple);
+}
+
+select, input, textarea {
+  width: 100%;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  background: var(--nwu-white);
+}
+
+select:focus, input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--nwu-purple);
+  box-shadow: 0 0 0 3px rgba(75, 40, 109, 0.1);
+}
+
+select:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Star Rating System */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.star-rating input[type="radio"] {
+  display: none;
+}
+
+.star-rating label {
+  font-size: 2rem;
+  cursor: pointer;
+  color: #ddd;
+  transition: color 0.3s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input[type="radio"]:checked ~ label {
+  color: var(--nwu-gold);
+}
+
+.submit-btn {
+  background: var(--nwu-purple);
+  color: var(--nwu-white);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--nwu-gold);
+  color: var(--nwu-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Message Styles */
+.message {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+.message.success {
+  background: var(--success-green);
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: var(--error-red);
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reviews Section */
+.ratings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list-group-item {
+  background: var(--light-purple);
+  border-left: 4px solid var(--nwu-purple);
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.list-group-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.list-group-item.error {
+  border-left-color: #dc3545;
+  background: var(--error-red);
+  color: #721c24;
+}
+
+.rating-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.campus-badge {
+  background: var(--nwu-purple);
+  color: var(--nwu-white);
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rating-stars {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.rating-comment {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255,255,255,0.7);
+  border-radius: 4px;
+}
+
+.rating-date {
+  font-size: 0.8rem;
+  color: #888;
+  text-align: right;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  main {
+    padding: 1rem;
+  }
+  
+  .rating-section, .reviews-section {
+    padding: 1.5rem;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .home-btn {
+    position: static;
+    margin-top: 1rem;
+  }
+  
+  .star-rating label {
+    font-size: 1.5rem;
+  }
+}
+
+/* Links */
+a {
+  color: var(--nwu-purple);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--nwu-gold);
+}
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: var(--light-purple);
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+/* Loading Spinner */
+#loadingSpinner {
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Welcome Page Styles */
+.welcome-section {
+  background: var(--nwu-white);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  box-shadow: 0 4px 20px rgba(75, 40, 109, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+.welcome-content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.welcome-text {
+  margin-bottom: 3rem;
+}
+
+.welcome-description {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.features {
+  margin-bottom: 2rem;
+}
+
+.features h3, .campuses h3 {
+  color: var(--nwu-purple);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.features ul {
+  list-style: none;
+  padding: 0;
+}
+
+.features li {
+  padding: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.campus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.campus-card {
+  background: var(--light-purple);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.campus-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(75, 40, 109, 0.15);
+}
+
+.campus-card h4 {
+  color: var(--nwu-purple);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.campus-card p {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.cta-section {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--nwu-purple) 0%, #6a4c8a 100%);
+  border-radius: 12px;
+  color: var(--nwu-white);
+}
+
+.cta-button {
+  background: var(--nwu-gold);
+  color: var(--nwu-purple);
+  border: none;
+  padding: 1.2rem 2.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.cta-button:hover {
+  background: var(--nwu-white);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.cta-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Responsive adjustments for welcome page */
+@media (max-width: 768px) {
+  .welcome-section {
+    padding: 2rem 1rem;
+  }
+  
+  .campus-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cta-button {
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+  }
+}
