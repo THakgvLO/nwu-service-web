@@ -2,7 +2,6 @@
 :root {
   --nwu-purple: #4B286D;
   --nwu-white: #fff;
-  --nwu-gold: #FFD100;
   --light-purple: #f8f6fa;
   --border-color: #e0d8e8;
   --success-green: #d4edda;
@@ -23,7 +22,7 @@ body {
 }
 
 header {
-  background: linear-gradient(135deg, var(--nwu-purple) 0%, #6a4c8a 100%);
+  background: var(--nwu-purple);
   color: var(--nwu-white);
   padding: 1.5rem 1rem;
   text-align: center;
@@ -44,10 +43,11 @@ header h1 {
   right: 1rem;
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .nwu-btn {
-  background: var(--nwu-gold);
+  background: var(--nwu-white);
   color: var(--nwu-purple);
   border: none;
   padding: 0.5rem 1rem;
@@ -57,16 +57,17 @@ header h1 {
   transition: all 0.3s ease;
   text-decoration: none;
   display: inline-block;
+  font-size: 0.9rem;
 }
 
 .nwu-btn:hover {
-  background: var(--nwu-white);
+  background: var(--light-purple);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .home-btn {
-  background: var(--nwu-gold);
+  background: var(--nwu-white);
   color: var(--nwu-purple);
   border: none;
   padding: 0.5rem 1rem;
@@ -74,10 +75,11 @@ header h1 {
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .home-btn:hover {
-  background: var(--nwu-white);
+  background: var(--light-purple);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
@@ -140,12 +142,13 @@ select:disabled {
   cursor: not-allowed;
 }
 
-/* Star Rating System */
+/* Star Rating System - Moved to the left */
 .star-rating {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+  justify-content: flex-start;
 }
 
 .star-rating input[type="radio"] {
@@ -162,7 +165,7 @@ select:disabled {
 .star-rating label:hover,
 .star-rating label:hover ~ label,
 .star-rating input[type="radio"]:checked ~ label {
-  color: var(--nwu-gold);
+  color: var(--nwu-purple);
 }
 
 .submit-btn {
@@ -180,8 +183,8 @@ select:disabled {
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: var(--nwu-gold);
-  color: var(--nwu-purple);
+  background: #3a1f56;
+  color: var(--nwu-white);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
@@ -290,62 +293,6 @@ select:disabled {
   text-align: right;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  main {
-    padding: 1rem;
-  }
-  
-  .rating-section, .reviews-section {
-    padding: 1.5rem;
-  }
-  
-  header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .home-btn {
-    position: static;
-    margin-top: 1rem;
-  }
-  
-  .star-rating label {
-    font-size: 1.5rem;
-  }
-}
-
-/* Links */
-a {
-  color: var(--nwu-purple);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: var(--nwu-gold);
-}
-
-footer {
-  text-align: center;
-  padding: 2rem;
-  background: var(--light-purple);
-  border-top: 1px solid var(--border-color);
-  margin-top: 2rem;
-}
-
-/* Loading Spinner */
-#loadingSpinner {
-  text-align: center;
-  font-size: 1.5rem;
-  margin: 1rem 0;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 /* Welcome Page Styles */
 .welcome-section {
   background: var(--nwu-white);
@@ -407,6 +354,7 @@ footer {
   border: 2px solid var(--border-color);
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
 }
 
 .campus-card:hover {
@@ -426,31 +374,47 @@ footer {
   font-size: 0.9rem;
 }
 
+.campus-note {
+  text-align: center;
+  color: var(--nwu-purple);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
 .cta-section {
   text-align: center;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--nwu-purple) 0%, #6a4c8a 100%);
+  background: var(--nwu-purple);
   border-radius: 12px;
   color: var(--nwu-white);
+  margin-top: 2rem;
+}
+
+.cta-content h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
 }
 
 .cta-button {
-  background: var(--nwu-gold);
+  background: var(--nwu-white);
   color: var(--nwu-purple);
   border: none;
-  padding: 1.2rem 2.5rem;
+  padding: 1.5rem 3rem;
   border-radius: 50px;
   cursor: pointer;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 700;
   text-decoration: none;
   display: inline-block;
   transition: all 0.3s ease;
   margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .cta-button:hover {
-  background: var(--nwu-white);
+  background: var(--light-purple);
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
@@ -461,8 +425,67 @@ footer {
   margin: 0;
 }
 
-/* Responsive adjustments for welcome page */
+/* Links */
+a {
+  color: var(--nwu-purple);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #3a1f56;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: var(--light-purple);
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+/* Loading Spinner */
+#loadingSpinner {
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  main {
+    padding: 1rem;
+  }
+  
+  .rating-section, .reviews-section {
+    padding: 1.5rem;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .header-buttons {
+    position: static;
+    margin-top: 1rem;
+    justify-content: center;
+  }
+  
+  .nwu-btn, .home-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .star-rating label {
+    font-size: 1.5rem;
+  }
+  
   .welcome-section {
     padding: 2rem 1rem;
   }
@@ -472,7 +495,32 @@ footer {
   }
   
   .cta-button {
+    font-size: 1.2rem;
+    padding: 1.2rem 2rem;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .submit-btn {
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .nwu-btn, .home-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .cta-button {
     font-size: 1.1rem;
-    padding: 1rem 2rem;
+    padding: 1rem 1.5rem;
   }
 }
