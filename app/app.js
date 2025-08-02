@@ -1,359 +1,159 @@
-import { db } from './firebase-config.js';
-import { collection, addDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// Import Firebase modules
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, onSnapshot, limit, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-// Enhanced campus services with descriptions
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyB91prjUz_5wkV_Cy_spRKrrALGiotBCh8",
+  authDomain: "nwu-service-app.firebaseapp.com",
+  projectId: "nwu-service-app",
+  storageBucket: "nwu-service-app.appspot.com",
+  messagingSenderId: "178834881312",
+  appId: "1:178834881312:web:d2b0e7bfe54d3be1b9f545",
+  measurementId: "G-8NC7N4ZDBY"
+};
+
+// Initialize Firebase
+let db;
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+} catch (error) {
+  console.error('Firebase initialization failed:', error);
+  // Mock db object for fallback
+  db = {
+    collection: () => ({
+      addDoc: () => Promise.resolve({ id: 'mock-id' }),
+      onSnapshot: () => () => {}
+    })
+  };
+}
+
+// Campus services data
 const campusServices = {
   Potchefstroom: [
-    { name: "Library", description: "Main campus library and study facilities" },
-    { name: "Admin Office", description: "Student administration and registration" },
-    { name: "Bathroom", description: "Campus restroom facilities" },
-    { name: "IT Help Desk", description: "Technical support and computer services" },
-    { name: "Cafeteria", description: "Student dining and food services" },
-    { name: "Health Center", description: "Student health and wellness services" }
+    { name: 'Library', description: 'Main campus library with extensive resources' },
+    { name: 'Cafeteria', description: 'Student dining facilities' },
+    { name: 'IT Support', description: 'Technical support and computer labs' },
+    { name: 'Transport', description: 'Campus shuttle and parking services' },
+    { name: 'Health Center', description: 'Student health and wellness services' },
+    { name: 'Sports Center', description: 'Recreation and fitness facilities' }
   ],
   Vanderbijlpark: [
-    { name: "Library", description: "Campus library and research facilities" },
-    { name: "Financial Aid", description: "Student financial assistance and bursaries" },
-    { name: "Bathroom", description: "Campus restroom facilities" },
-    { name: "Student Centre", description: "Student activities and events center" },
-    { name: "Sports Complex", description: "Athletic facilities and gym" },
-    { name: "Bookstore", description: "Textbooks and campus supplies" }
+    { name: 'Library', description: 'Modern library with digital resources' },
+    { name: 'Cafeteria', description: 'Contemporary dining options' },
+    { name: 'IT Support', description: 'Advanced technology support' },
+    { name: 'Transport', description: 'Efficient campus transportation' },
+    { name: 'Health Center', description: 'Comprehensive health services' },
+    { name: 'Sports Center', description: 'State-of-the-art sports facilities' }
   ],
   Mahikeng: [
-    { name: "Library", description: "Academic library and study spaces" },
-    { name: "Registrar", description: "Student records and academic services" },
-    { name: "Bathroom", description: "Campus restroom facilities" },
-    { name: "Science Lab", description: "Laboratory facilities and equipment" },
-    { name: "Computer Lab", description: "Computer access and printing services" },
-    { name: "Student Lounge", description: "Relaxation and social spaces" }
+    { name: 'Library', description: 'Historic library with unique collections' },
+    { name: 'Cafeteria', description: 'Traditional and modern dining' },
+    { name: 'IT Support', description: 'Reliable technical assistance' },
+    { name: 'Transport', description: 'Campus and city transportation' },
+    { name: 'Health Center', description: 'Quality healthcare services' },
+    { name: 'Sports Center', description: 'Diverse recreational facilities' }
   ]
 };
 
-console.log('App.js loaded successfully');
-console.log('Campus services data:', campusServices);
-
 // DOM elements
-const campusSelect = document.getElementById('campusSelect');
-const serviceSelect = document.getElementById('serviceSelect');
-const ratingForm = document.getElementById('ratingForm');
-const commentInput = document.getElementById('commentInput');
-const homeBtn = document.getElementById('homeBtn');
-const ratingsList = document.getElementById('ratingsList');
-const submitBtn = document.querySelector('button[type="submit"]');
-const loadingSpinner = document.getElementById('loadingSpinner');
+const elements = {
+  campusSelect: document.getElementById('campusSelect'),
+  serviceSelect: document.getElementById('serviceSelect'),
+  ratingForm: document.getElementById('ratingForm'),
+  ratingInput: document.getElementById('ratingInput'),
+  ratingValue: document.getElementById('ratingValue'),
+  commentInput: document.getElementById('commentInput'),
+  ratingsList: document.getElementById('ratingsList'),
+  homeBtn: document.getElementById('homeBtn')
+};
 
-console.log('DOM elements found:', {
-  campusSelect: !!campusSelect,
-  serviceSelect: !!serviceSelect,
-  ratingForm: !!ratingForm,
-  homeBtn: !!homeBtn,
-  ratingsList: !!ratingsList
-});
-
-// Loading state management
+// Utility functions
 function setLoading(isLoading) {
+  const submitBtn = document.querySelector('.card-btn.primary');
   if (submitBtn) {
     submitBtn.disabled = isLoading;
     submitBtn.textContent = isLoading ? 'Submitting...' : 'Submit Rating';
   }
-  if (loadingSpinner) {
-    loadingSpinner.style.display = isLoading ? 'block' : 'none';
-  }
 }
 
-// Show user feedback
 function showMessage(message, type = 'success') {
+  // Remove existing messages
+  const existingMessage = document.querySelector('.message');
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+
+  // Create new message
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${type}`;
   messageDiv.textContent = message;
-  messageDiv.style.cssText = `
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
-    text-align: center;
-    ${type === 'success' ? 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;' : 
-      'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'}
-  `;
-  
-  ratingForm.insertBefore(messageDiv, ratingForm.firstChild);
-  
+
+  // Insert message before the form
+  const form = document.getElementById('ratingForm');
+  if (form) {
+    form.parentNode.insertBefore(messageDiv, form);
+  }
+
+  // Auto-remove after 5 seconds
   setTimeout(() => {
-    messageDiv.remove();
+    if (messageDiv.parentNode) {
+      messageDiv.remove();
+    }
   }, 5000);
 }
 
-// Update services when campus changes
+// Update services dropdown based on campus selection
 function updateServices() {
-  console.log('updateServices called');
-  const campus = campusSelect.value;
-  console.log('Selected campus:', campus);
+  const selectedCampus = elements.campusSelect.value;
+  const serviceSelect = elements.serviceSelect;
   
-  serviceSelect.innerHTML = '<option value="">Choose a service</option>';
+  // Clear current options
+  serviceSelect.innerHTML = '<option value="">Select a campus first</option>';
   
-  if (campus && campusServices[campus]) {
-    console.log('Services for campus:', campusServices[campus]);
-    campusServices[campus].forEach(service => {
-      const opt = document.createElement('option');
-      opt.value = service.name;
-      opt.textContent = `${service.name} - ${service.description}`;
-      serviceSelect.appendChild(opt);
-    });
+  if (selectedCampus && campusServices[selectedCampus]) {
+    // Enable service select
     serviceSelect.disabled = false;
-    console.log('Services loaded successfully');
+    
+    // Add service options
+    campusServices[selectedCampus].forEach(service => {
+      const option = document.createElement('option');
+      option.value = service.name;
+      option.textContent = service.name;
+      serviceSelect.appendChild(option);
+    });
   } else {
-    console.log('No services found for campus:', campus);
+    // Disable service select
     serviceSelect.disabled = true;
   }
 }
 
-// Add event listener for campus selection
-if (campusSelect) {
-  campusSelect.addEventListener('change', () => {
-    console.log('Campus selection changed');
-    updateServices();
-  });
-} else {
-  console.error('Campus select element not found!');
-}
-
-// Submit rating to Firebase (with fallback for testing)
-if (ratingForm) {
-  ratingForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const campus = campusSelect.value;
-    const service = serviceSelect.value;
-    const rating = parseFloat(document.getElementById('ratingInput').value) || 0;
-    const comment = commentInput.value.trim() || "No comment provided";
-
-    console.log('Form submission:', { campus, service, rating, comment });
-
-    // Validation
-    if (!campus || !service || !rating) {
-      showMessage('Please fill in all required fields', 'error');
-      return;
-    }
-
-    if (rating < 0.5 || rating > 5) {
-      showMessage('Please select a rating between 0.5 and 5 stars', 'error');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Try to submit to Firebase
-      await addDoc(collection(db, 'ratings'), {
-        campus,
-        service,
-        rating,
-        comment,
-        timestamp: new Date()
-      });
-      
-      showMessage(`Thank you for rating ${service}! Your feedback helps improve campus services.`);
-      ratingForm.reset();
-      serviceSelect.innerHTML = '<option value="">Select a campus first</option>';
-      serviceSelect.disabled = true;
-      
-    } catch (err) {
-      console.error('Error submitting rating:', err);
-      
-      // Fallback: Store in localStorage for testing
-      const testRatings = JSON.parse(localStorage.getItem('testRatings') || '[]');
-      testRatings.push({
-        campus,
-        service,
-        rating,
-        comment,
-        timestamp: new Date().toISOString()
-      });
-      localStorage.setItem('testRatings', JSON.stringify(testRatings));
-      
-      showMessage(`Thank you for rating ${service}! (Test mode - stored locally)`);
-      ratingForm.reset();
-      serviceSelect.innerHTML = '<option value="">Select a campus first</option>';
-      serviceSelect.disabled = true;
-    } finally {
-      setLoading(false);
-    }
-  });
-} else {
-  console.error('Rating form not found!');
-}
-
-// Load recent ratings in real-time with better formatting (with fallback)
-try {
-  const q = query(collection(db, 'ratings'), orderBy('timestamp', 'desc'), limit(20));
-  onSnapshot(q, (snapshot) => {
-    console.log('Ratings loaded:', snapshot.size, 'items');
-    ratingsList.innerHTML = '';
-    
-    if (snapshot.empty) {
-      // Check for test ratings
-      const testRatings = JSON.parse(localStorage.getItem('testRatings') || '[]');
-      if (testRatings.length > 0) {
-        testRatings.slice(0, 5).forEach(rating => {
-          const li = document.createElement('li');
-          li.className = 'list-group-item';
-          const stars = getStarDisplay(rating.rating);
-          const date = new Date(rating.timestamp).toLocaleDateString();
-          
-          li.innerHTML = `
-            <div class="rating-header">
-              <strong>${rating.service}</strong> 
-              <span class="campus-badge">${rating.campus} (Test)</span>
-            </div>
-            <div class="rating-stars">${stars}</div>
-            <div class="rating-comment">"${rating.comment}"</div>
-            <div class="rating-date">${date}</div>
-          `;
-          ratingsList.appendChild(li);
-        });
-      } else {
-        ratingsList.innerHTML = '<li class="list-group-item">No ratings yet. Be the first to rate a service!</li>';
-      }
-      return;
-    }
-    
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      const li = document.createElement('li');
-      li.className = 'list-group-item';
-      
-      const stars = getStarDisplay(data.rating);
-      const date = new Date(data.timestamp.toDate()).toLocaleDateString();
-      
-      li.innerHTML = `
-        <div class="rating-header">
-          <strong>${data.service}</strong> 
-          <span class="campus-badge">${data.campus}</span>
-        </div>
-        <div class="rating-stars">${stars}</div>
-        <div class="rating-comment">"${data.comment}"</div>
-        <div class="rating-date">${date}</div>
-      `;
-      ratingsList.appendChild(li);
-    });
-  }, (error) => {
-    console.error('Error loading ratings:', error);
-    // Show test ratings as fallback
-    const testRatings = JSON.parse(localStorage.getItem('testRatings') || '[]');
-    if (testRatings.length > 0) {
-      testRatings.slice(0, 5).forEach(rating => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        const stars = getStarDisplay(rating.rating);
-        const date = new Date(rating.timestamp).toLocaleDateString();
-        
-        li.innerHTML = `
-          <div class="rating-header">
-            <strong>${rating.service}</strong> 
-            <span class="campus-badge">${rating.campus} (Test)</span>
-          </div>
-          <div class="rating-stars">${stars}</div>
-          <div class="rating-comment">"${rating.comment}"</div>
-          <div class="rating-date">${date}</div>
-        `;
-        ratingsList.appendChild(li);
-      });
-    } else {
-      ratingsList.innerHTML = '<li class="list-group-item error">Error loading ratings. Please refresh the page.</li>';
-    }
-  });
-} catch (error) {
-  console.error('Error setting up ratings listener:', error);
-  // Show test ratings as fallback
-  const testRatings = JSON.parse(localStorage.getItem('testRatings') || '[]');
-  if (testRatings.length > 0) {
-    testRatings.slice(0, 5).forEach(rating => {
-      const li = document.createElement('li');
-      li.className = 'list-group-item';
-      const stars = getStarDisplay(rating.rating);
-      const date = new Date(rating.timestamp).toLocaleDateString();
-      
-      li.innerHTML = `
-        <div class="rating-header">
-          <strong>${rating.service}</strong> 
-          <span class="campus-badge">${rating.campus} (Test)</span>
-        </div>
-        <div class="rating-stars">${stars}</div>
-        <div class="rating-comment">"${rating.comment}"</div>
-        <div class="rating-date">${date}</div>
-      `;
-      ratingsList.appendChild(li);
-    });
-  }
-}
-
-// Home button: reset form
-if (homeBtn) {
-  homeBtn.addEventListener('click', () => {
-    window.location.href = 'index.html';
-  });
-} else {
-  console.error('Home button not found!');
-}
-
-// Initialize services on page load
-window.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM Content Loaded');
-  updateServices();
-  
-  // Initialize star rating system
-  initializeStarRating();
-  
-  // Add loading spinner if it doesn't exist
-  if (!loadingSpinner) {
-    const spinner = document.createElement('div');
-    spinner.id = 'loadingSpinner';
-    spinner.innerHTML = '⏳';
-    spinner.style.cssText = 'display: none; text-align: center; font-size: 20px; margin: 10px 0;';
-    ratingForm.appendChild(spinner);
-  }
-  
-  console.log('Initialization complete');
-});
-
-// Initialize interactive star rating system
+// Initialize star rating system (10 stars: 0.5 to 5.0)
 function initializeStarRating() {
   const stars = document.querySelectorAll('.star');
   const ratingInput = document.getElementById('ratingInput');
   const ratingValue = document.getElementById('ratingValue');
-  
+  const starDisplays = document.querySelectorAll('.star-display');
+
   let currentRating = 0;
-  
-  stars.forEach((star, index) => {
-    // Click event with half-star detection
-    star.addEventListener('click', (e) => {
-      const rect = star.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const starWidth = rect.width;
-      
-      // Determine if click is on left (half star) or right (full star) side
-      const isHalfStar = clickX < starWidth / 2;
-      const baseRating = index + 1; // 1, 2, 3, 4, 5
-      const rating = isHalfStar ? baseRating - 0.5 : baseRating;
-      
+
+  stars.forEach((star) => {
+    const rating = parseFloat(star.dataset.rating);
+    
+    // Click event
+    star.addEventListener('click', () => {
       currentRating = rating;
       updateStarDisplay(rating);
       ratingInput.value = rating;
       ratingValue.textContent = rating.toFixed(1);
     });
-    
+
     // Hover events for preview
-    star.addEventListener('mouseenter', (e) => {
-      const rect = star.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const starWidth = rect.width;
-      
-      const isHalfStar = mouseX < starWidth / 2;
-      const baseRating = index + 1; // 1, 2, 3, 4, 5
-      const rating = isHalfStar ? baseRating - 0.5 : baseRating;
-      
+    star.addEventListener('mouseenter', () => {
       updateStarDisplay(rating, true);
     });
-    
+
     star.addEventListener('mouseleave', () => {
       updateStarDisplay(currentRating, false);
     });
@@ -362,12 +162,14 @@ function initializeStarRating() {
 
 // Update star display
 function updateStarDisplay(rating, isPreview = false) {
+  const starDisplays = document.querySelectorAll('.star-display');
   const stars = document.querySelectorAll('.star');
-  
-  stars.forEach((star, index) => {
+
+  // Update display stars (5 stars)
+  starDisplays.forEach((star, index) => {
     const starNumber = index + 1; // 1, 2, 3, 4, 5
     star.classList.remove('active', 'half-active');
-    
+
     if (rating >= starNumber) {
       // Full star
       star.classList.add('active');
@@ -375,12 +177,21 @@ function updateStarDisplay(rating, isPreview = false) {
       // Half star
       star.classList.add('half-active');
     }
-    // If rating < starNumber - 0.5, star remains gray (default)
   });
-  
+
+  // Update input stars (10 stars)
+  stars.forEach((star) => {
+    const starRating = parseFloat(star.dataset.rating);
+    star.classList.remove('active');
+    
+    if (rating >= starRating) {
+      star.classList.add('active');
+    }
+  });
+
   // Update display text
   const ratingValue = document.getElementById('ratingValue');
-  if (!isPreview) {
+  if (!isPreview && ratingValue) {
     ratingValue.textContent = rating.toFixed(1);
   }
 }
@@ -390,6 +201,136 @@ function getStarDisplay(rating) {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-  
+
   return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+}
+
+// Handle form submission
+async function handleFormSubmit(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const rating = parseFloat(formData.get('rating'));
+  const campus = formData.get('campus');
+  const service = formData.get('service');
+  const comment = formData.get('comment');
+
+  // Validation
+  if (!campus || !service) {
+    showMessage('Please select both campus and service.', 'error');
+    return;
+  }
+
+  if (!rating || rating < 0.5 || rating > 5) {
+    showMessage('Please provide a valid rating between 0.5 and 5.0.', 'error');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const ratingData = {
+      campus,
+      service,
+      rating,
+      comment: comment.trim() || 'No comment provided',
+      timestamp: new Date()
+    };
+
+    await addDoc(collection(db, 'ratings'), ratingData);
+    
+    showMessage('Rating submitted successfully! Thank you for your feedback.');
+    event.target.reset();
+    
+    // Reset star display
+    updateStarDisplay(0);
+    
+  } catch (error) {
+    console.error('Error submitting rating:', error);
+    showMessage('Failed to submit rating. Please try again.', 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// Load and display recent ratings
+function loadRecentRatings() {
+  try {
+    const ratingsRef = collection(db, 'ratings');
+    const q = ratingsRef.orderBy('timestamp', 'desc').limit(20);
+
+    onSnapshot(q, (snapshot) => {
+      const ratings = [];
+      snapshot.forEach((doc) => {
+        ratings.push({ id: doc.id, ...doc.data() });
+      });
+
+      displayRatings(ratings);
+    }, (error) => {
+      console.error('Error loading ratings:', error);
+      elements.ratingsList.innerHTML = '<li class="rating-item error">Error loading recent reviews.</li>';
+    });
+  } catch (error) {
+    console.error('Error setting up ratings listener:', error);
+  }
+}
+
+// Display ratings in the list
+function displayRatings(ratings) {
+  if (ratings.length === 0) {
+    elements.ratingsList.innerHTML = '<li class="rating-item">No reviews yet. Be the first to rate a service!</li>';
+    return;
+  }
+
+  elements.ratingsList.innerHTML = ratings.map(rating => {
+    const date = rating.timestamp?.toDate ? rating.timestamp.toDate() : new Date(rating.timestamp);
+    const formattedDate = date.toLocaleDateString();
+    const starDisplay = getStarDisplay(rating.rating);
+    
+    return `
+      <li class="rating-item">
+        <div class="rating-header">
+          <span class="rating-service">${rating.service} (${rating.campus})</span>
+          <span class="rating-date">${formattedDate}</span>
+        </div>
+        <div class="rating-stars">${starDisplay} ${rating.rating.toFixed(1)}</div>
+        <div class="rating-comment">${rating.comment}</div>
+      </li>
+    `;
+  }).join('');
+}
+
+// Initialize the application
+function initializeApp() {
+  console.log('Initializing NWU Services App...');
+
+  // Add event listeners
+  if (elements.campusSelect) {
+    elements.campusSelect.addEventListener('change', updateServices);
+  }
+
+  if (elements.ratingForm) {
+    elements.ratingForm.addEventListener('submit', handleFormSubmit);
+  }
+
+  if (elements.homeBtn) {
+    elements.homeBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  }
+
+  // Initialize star rating system
+  initializeStarRating();
+
+  // Load recent ratings
+  loadRecentRatings();
+
+  console.log('App initialization complete');
+}
+
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
 }

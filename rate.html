@@ -8,73 +8,137 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
-    <h1>NWU Services</h1>
-    <div class="header-buttons">
-      <a href="https://www.nwu.ac.za/" target="_blank" class="btn-primary nwu-btn">NWU Website</a>
-      <button id="homeBtn" class="btn-primary home-btn">Home</button>
-    </div>
-  </header>
-  <main>
-    <section class="rating-section">
-      <h2>Rate a Campus Service</h2>
-      <p class="section-description">Help improve campus services by sharing your experience!</p>
-      
-      <form id="ratingForm" class="rating-form">
-        <div class="form-group">
-          <label for="campusSelect">Campus:</label>
-          <select id="campusSelect" required>
-            <option value="">Select your campus</option>
-            <option value="Potchefstroom">Potchefstroom</option>
-            <option value="Vanderbijlpark">Vanderbijlpark</option>
-            <option value="Mahikeng">Mahikeng</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="serviceSelect">Service:</label>
-          <select id="serviceSelect" required disabled>
-            <option value="">Select a campus first</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="ratingInput">Rating:</label>
-          <div class="star-rating">
-            <div class="stars">
-              <span class="star">☆</span>
-              <span class="star">☆</span>
-              <span class="star">☆</span>
-              <span class="star">☆</span>
-              <span class="star">☆</span>
-            </div>
-            <input type="hidden" id="ratingInput" name="rating" value="" required>
-            <div class="rating-display">
-              <span id="ratingValue">0.0</span> / 5.0
-            </div>
+  <div class="app-container">
+    <!-- Header with gradient background -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo-container">
+            <div class="logo-icon">NWU</div>
           </div>
-          <small>Click on stars to rate. Half stars are supported.</small>
+          <div class="welcome-text">
+            <h1>Rate Campus Services</h1>
+            <p>Share your experience and help improve campus life</p>
+          </div>
         </div>
-        
-        <div class="form-group">
-          <label for="commentInput">Comment (Optional):</label>
-          <textarea id="commentInput" rows="3" placeholder="Share your experience with this service..."></textarea>
+        <div class="header-right">
+          <a href="https://www.nwu.ac.za/" target="_blank" class="header-btn">NWU Website</a>
+          <a href="index.html" class="header-btn home-btn">Home</a>
         </div>
-        
-        <button type="submit" class="btn-primary submit-btn">Submit Rating</button>
-      </form>
-    </section>
-    
-    <section class="reviews-section">
-      <h2>Recent Reviews</h2>
-      <div class="reviews-container">
-        <ul id="ratingsList" class="ratings-list"></ul>
       </div>
-    </section>
-  </main>
-  <footer>
-    <p>Created by Thakgalo Sehlola | <a href="https://github.com/THakgvLO" target="_blank">GitHub</a></p>
-  </footer>
+    </header>
+
+    <!-- Main content area -->
+    <main class="app-main">
+      <!-- Navigation tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab active">Rate Service</button>
+        <button class="nav-tab">Recent Reviews</button>
+        <button class="nav-tab">Statistics</button>
+        <button class="nav-tab">Help</button>
+      </div>
+
+      <!-- Rating form card -->
+      <div class="content-card rating-form-card">
+        <div class="card-icon">
+          <div class="icon-circle">
+            <span class="icon">⭐</span>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3>Submit Your Rating</h3>
+          <p>Help improve campus services by sharing your experience</p>
+          
+          <form id="ratingForm" class="rating-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="campusSelect">Campus</label>
+                <select id="campusSelect" required>
+                  <option value="">Select your campus</option>
+                  <option value="Potchefstroom">Potchefstroom</option>
+                  <option value="Vanderbijlpark">Vanderbijlpark</option>
+                  <option value="Mahikeng">Mahikeng</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="serviceSelect">Service</label>
+                <select id="serviceSelect" required disabled>
+                  <option value="">Select a campus first</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Rating</label>
+              <div class="star-rating-container">
+                <div class="star-rating-display">
+                  <div class="rating-box">
+                    <span id="ratingValue">0.0</span>
+                  </div>
+                  <div class="stars-display">
+                    <span class="star-display">☆</span>
+                    <span class="star-display">☆</span>
+                    <span class="star-display">☆</span>
+                    <span class="star-display">☆</span>
+                    <span class="star-display">☆</span>
+                  </div>
+                </div>
+                <div class="star-rating-input">
+                  <div class="stars">
+                    <span class="star" data-rating="0.5">☆</span>
+                    <span class="star" data-rating="1.0">☆</span>
+                    <span class="star" data-rating="1.5">☆</span>
+                    <span class="star" data-rating="2.0">☆</span>
+                    <span class="star" data-rating="2.5">☆</span>
+                    <span class="star" data-rating="3.0">☆</span>
+                    <span class="star" data-rating="3.5">☆</span>
+                    <span class="star" data-rating="4.0">☆</span>
+                    <span class="star" data-rating="4.5">☆</span>
+                    <span class="star" data-rating="5.0">☆</span>
+                  </div>
+                  <input type="hidden" id="ratingInput" name="rating" value="" required>
+                  <small>Click on stars to rate (0.5 to 5.0)</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="commentInput">Comment (Optional)</label>
+              <textarea id="commentInput" rows="3" placeholder="Share your experience with this service..."></textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="card-btn primary">Submit Rating</button>
+              <button type="reset" class="card-btn secondary">Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Recent reviews card -->
+      <div class="content-card reviews-card">
+        <div class="card-icon">
+          <div class="icon-circle">
+            <span class="icon">📝</span>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3>Recent Reviews</h3>
+          <p>See what other students are saying about campus services</p>
+          
+          <div class="reviews-container">
+            <ul id="ratingsList" class="ratings-list"></ul>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Created by Thakgalo Sehlola | <a href="https://github.com/THakgvLO" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+  </div>
   
   <script type="module" src="app/app.js"></script>
 </body>

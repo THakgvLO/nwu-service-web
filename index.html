@@ -8,62 +8,120 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
-    <h1>NWU Services</h1>
-    <a href="https://www.nwu.ac.za/" target="_blank" class="btn-primary nwu-btn">NWU Website</a>
-  </header>
-  <main>
-    <section class="welcome-section">
-      <h2>Welcome to NWU Services</h2>
-      <div class="welcome-content">
-        <div class="welcome-text">
-          <p class="welcome-description">
-            Help improve campus services by sharing your experience! This platform allows NWU students 
-            to rate and comment on various campus services across all three campuses.
-          </p>
-          
-          <div class="features">
-            <h3>What you can do:</h3>
-            <ul>
-              <li>Rate campus services from 1-5 stars</li>
-              <li>Share your feedback and suggestions</li>
-              <li>View recent reviews from fellow students</li>
-              <li>Support all three NWU campuses</li>
-            </ul>
+  <div class="app-container">
+    <!-- Header with gradient background -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo-container">
+            <div class="logo-icon">NWU</div>
           </div>
-          
-          <div class="campuses">
-            <h3>Available Campuses:</h3>
-            <p class="campus-note">Click the button below to start rating services</p>
-            <div class="campus-grid">
-              <div class="campus-card">
-                <h4>Potchefstroom</h4>
-                <p>Main campus with comprehensive facilities</p>
+          <div class="welcome-text">
+            <h1>Welcome to NWU Services</h1>
+            <p>Your feedback helps improve campus life</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <a href="https://www.nwu.ac.za/" target="_blank" class="header-btn">NWU Website</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content area -->
+    <main class="app-main">
+      <!-- Navigation tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab active">Overview</button>
+        <button class="nav-tab">Campuses</button>
+        <button class="nav-tab">Services</button>
+        <button class="nav-tab">About</button>
+      </div>
+
+      <!-- Content cards -->
+      <div class="content-cards">
+        <!-- Feature card -->
+        <div class="content-card feature-card">
+          <div class="card-icon">
+            <div class="icon-circle">
+              <span class="icon">⭐</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3>Rate Campus Services</h3>
+            <p>Share your experience with campus services and help improve the student experience for everyone.</p>
+            <div class="card-actions">
+              <a href="rate.html" class="card-btn primary">Start Rating</a>
+              <button class="card-btn secondary">Learn More</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campus card -->
+        <div class="content-card campus-card">
+          <div class="card-icon">
+            <div class="icon-circle">
+              <span class="icon">🏛️</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3>Three Campuses</h3>
+            <p>Rate services across all NWU campuses: Potchefstroom, Vanderbijlpark, and Mahikeng.</p>
+            <div class="campus-list">
+              <span class="campus-tag">Potchefstroom</span>
+              <span class="campus-tag">Vanderbijlpark</span>
+              <span class="campus-tag">Mahikeng</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services card -->
+        <div class="content-card services-card">
+          <div class="card-icon">
+            <div class="icon-circle">
+              <span class="icon">📚</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3>Multiple Services</h3>
+            <p>Rate various campus services including libraries, cafeterias, IT support, and more.</p>
+            <div class="service-highlights">
+              <span class="service-item">Library</span>
+              <span class="service-item">Cafeteria</span>
+              <span class="service-item">IT Support</span>
+              <span class="service-item">Transport</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent activity card -->
+        <div class="content-card activity-card">
+          <div class="card-icon">
+            <div class="icon-circle">
+              <span class="icon">📊</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3>Recent Activity</h3>
+            <p>See what other students are saying about campus services.</p>
+            <div class="activity-stats">
+              <div class="stat">
+                <span class="stat-number">150+</span>
+                <span class="stat-label">Reviews</span>
               </div>
-              <div class="campus-card">
-                <h4>Vanderbijlpark</h4>
-                <p>Modern campus with excellent resources</p>
-              </div>
-              <div class="campus-card">
-                <h4>Mahikeng</h4>
-                <p>Historic campus with unique services</p>
+              <div class="stat">
+                <span class="stat-number">4.2</span>
+                <span class="stat-label">Avg Rating</span>
               </div>
             </div>
           </div>
         </div>
-        
-        <div class="cta-section">
-          <div class="cta-content">
-            <h3>Ready to Rate?</h3>
-            <a href="rate.html" class="btn-primary cta-button">Start Rating Services</a>
-            <p class="cta-subtitle">Your feedback makes a difference!</p>
-          </div>
-        </div>
       </div>
-    </section>
-  </main>
-  <footer>
-    <p>Created by Thakgalo Sehlola | <a href="https://github.com/THakgvLO" target="_blank" rel="noopener">GitHub</a></p>
-  </footer>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Created by Thakgalo Sehlola | <a href="https://github.com/THakgvLO" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+  </div>
 </body>
 </html>
