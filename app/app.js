@@ -1,6 +1,6 @@
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, addDoc, onSnapshot, limit, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -245,9 +245,16 @@ async function handleFormSubmit(event) {
   const comment = formData.get('comment');
 
   console.log('Form submission:', { campus, service, rating, comment });
+  console.log('Form data values:', {
+    campus: campus,
+    service: service,
+    rating: rating,
+    comment: comment
+  });
 
   // Validation
   if (!campus || !service) {
+    console.log('Validation failed - Campus:', campus, 'Service:', service);
     showMessage('Please select both campus and service.', 'error');
     return;
   }
@@ -276,6 +283,12 @@ async function handleFormSubmit(event) {
     // Reset star display
     updateStarDisplay(0);
     
+    // Refresh ratings display
+    console.log('Rating submitted, refreshing ratings display...');
+    setTimeout(() => {
+      loadRecentRatings();
+    }, 1000);
+    
   } catch (error) {
     console.error('Error submitting rating:', error);
     showMessage('Failed to submit rating. Please try again.', 'error');
@@ -286,16 +299,25 @@ async function handleFormSubmit(event) {
 
 // Load and display recent ratings
 function loadRecentRatings() {
+  console.log('Loading recent ratings...');
+  
   try {
     const ratingsRef = collection(db, 'ratings');
-    const q = ratingsRef.orderBy('timestamp', 'desc').limit(20);
+    const q = query(ratingsRef, orderBy('timestamp', 'desc'), limit(20));
 
+    console.log('Setting up ratings listener...');
+    
     onSnapshot(q, (snapshot) => {
+      console.log('Ratings snapshot received, size:', snapshot.size);
+      
       const ratings = [];
       snapshot.forEach((doc) => {
-        ratings.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        console.log('Rating data:', data);
+        ratings.push({ id: doc.id, ...data });
       });
 
+      console.log('Total ratings loaded:', ratings.length);
       displayRatings(ratings);
     }, (error) => {
       console.error('Error loading ratings:', error);
@@ -305,38 +327,81 @@ function loadRecentRatings() {
     });
   } catch (error) {
     console.error('Error setting up ratings listener:', error);
+    if (elements.ratingsList) {
+      elements.ratingsList.innerHTML = '<li class="rating-item error">Error setting up ratings listener.</li>';
+    }
   }
 }
 
 // Display ratings in the list
 function displayRatings(ratings) {
+  console.log('Displaying ratings:', ratings.length);
+  
   if (!elements.ratingsList) {
     console.error('Ratings list element not found');
     return;
   }
   
+  console.log('Ratings list element found, updating content...');
+  
   if (ratings.length === 0) {
+    console.log('No ratings to display, showing empty message');
     elements.ratingsList.innerHTML = '<li class="rating-item">No reviews yet. Be the first to rate a service!</li>';
     return;
   }
 
-  elements.ratingsList.innerHTML = ratings.map(rating => {
+  const ratingsHTML = ratings.map(rating => {
+    console.log('Processing rating:', rating);
+    
     const date = rating.timestamp?.toDate ? rating.timestamp.toDate() : new Date(rating.timestamp);
     const formattedDate = date.toLocaleDateString();
     const starDisplay = getStarDisplay(rating.rating);
     
     return `
-      <li class="rating-item">
+      <li class="rating-item" data-rating-id="${rating.id}">
         <div class="rating-header">
           <span class="rating-service">${rating.service} (${rating.campus})</span>
-          <span class="rating-date">${formattedDate}</span>
+          <div class="rating-actions">
+            <span class="rating-date">${formattedDate}</span>
+            <button class="delete-btn" onclick="deleteRating('${rating.id}')" title="Delete this review">
+              <span class="delete-icon">🗑️</span>
+            </button>
+          </div>
         </div>
         <div class="rating-stars">${starDisplay} ${rating.rating}</div>
         <div class="rating-comment">${rating.comment}</div>
       </li>
     `;
   }).join('');
+  
+  console.log('Generated ratings HTML:', ratingsHTML);
+  elements.ratingsList.innerHTML = ratingsHTML;
+  console.log('Ratings list updated successfully');
 }
+
+// Delete a rating
+async function deleteRating(ratingId) {
+  if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+    return;
+  }
+
+  try {
+    console.log('Deleting rating:', ratingId);
+    
+    // Delete from Firestore
+    await deleteDoc(doc(db, 'ratings', ratingId));
+    
+    showMessage('Review deleted successfully!');
+    console.log('Rating deleted successfully');
+    
+  } catch (error) {
+    console.error('Error deleting rating:', error);
+    showMessage('Failed to delete review. Please try again.', 'error');
+  }
+}
+
+// Make deleteRating function globally available
+window.deleteRating = deleteRating;
 
 // Initialize the NWU application
 function initializeNWUApp() {
