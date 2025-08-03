@@ -270,12 +270,6 @@ body {
   box-shadow: 0 0 0 3px rgba(75, 40, 109, 0.1);
 }
 
-.form-group select:disabled {
-  background: var(--nwu-gray-light);
-  color: var(--nwu-text-light);
-  cursor: not-allowed;
-}
-
 /* Star Rating System */
 .star-rating-container {
   display: flex;
@@ -316,20 +310,6 @@ body {
 
 .star-display.active {
   color: var(--nwu-star-active);
-}
-
-.star-display.half-active {
-  color: var(--nwu-star-active);
-  position: relative;
-}
-
-.star-display.half-active::after {
-  content: '☆';
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: var(--nwu-star-inactive);
-  clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
 }
 
 .star-rating-input {

@@ -18,6 +18,7 @@ let db;
 try {
   const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
+  console.log('Firebase initialized successfully');
 } catch (error) {
   console.error('Firebase initialization failed:', error);
   // Mock db object for fallback
@@ -35,7 +36,7 @@ const campusServices = {
     { name: 'Library', description: 'Main campus library with extensive resources' },
     { name: 'Cafeteria', description: 'Student dining facilities' },
     { name: 'IT Support', description: 'Technical support and computer labs' },
-    { name: 'Transport', description: 'Campus shuttle and parking services' },
+    { name: 'Gym', description: 'Fitness center and sports facilities' },
     { name: 'Health Center', description: 'Student health and wellness services' },
     { name: 'Sports Center', description: 'Recreation and fitness facilities' }
   ],
@@ -43,7 +44,7 @@ const campusServices = {
     { name: 'Library', description: 'Modern library with digital resources' },
     { name: 'Cafeteria', description: 'Contemporary dining options' },
     { name: 'IT Support', description: 'Advanced technology support' },
-    { name: 'Transport', description: 'Efficient campus transportation' },
+    { name: 'Gym', description: 'Fitness center and sports facilities' },
     { name: 'Health Center', description: 'Comprehensive health services' },
     { name: 'Sports Center', description: 'State-of-the-art sports facilities' }
   ],
@@ -51,11 +52,13 @@ const campusServices = {
     { name: 'Library', description: 'Historic library with unique collections' },
     { name: 'Cafeteria', description: 'Traditional and modern dining' },
     { name: 'IT Support', description: 'Reliable technical assistance' },
-    { name: 'Transport', description: 'Campus and city transportation' },
+    { name: 'Gym', description: 'Fitness center and sports facilities' },
     { name: 'Health Center', description: 'Quality healthcare services' },
     { name: 'Sports Center', description: 'Diverse recreational facilities' }
   ]
 };
+
+console.log('Campus services data loaded:', Object.keys(campusServices));
 
 // DOM elements
 const elements = {
@@ -68,6 +71,17 @@ const elements = {
   ratingsList: document.getElementById('ratingsList'),
   homeBtn: document.getElementById('homeBtn')
 };
+
+console.log('DOM elements found:', {
+  campusSelect: !!elements.campusSelect,
+  serviceSelect: !!elements.serviceSelect,
+  ratingForm: !!elements.ratingForm,
+  ratingInput: !!elements.ratingInput,
+  ratingValue: !!elements.ratingValue,
+  commentInput: !!elements.commentInput,
+  ratingsList: !!elements.ratingsList,
+  homeBtn: !!elements.homeBtn
+});
 
 // Utility functions
 function setLoading(isLoading) {
@@ -106,15 +120,24 @@ function showMessage(message, type = 'success') {
 
 // Update services dropdown based on campus selection
 function updateServices() {
+  console.log('updateServices function called');
+  
+  if (!elements.campusSelect || !elements.serviceSelect) {
+    console.error('Required DOM elements not found');
+    return;
+  }
+  
   const selectedCampus = elements.campusSelect.value;
   const serviceSelect = elements.serviceSelect;
   
+  console.log('Selected campus:', selectedCampus);
+  
   // Clear current options
-  serviceSelect.innerHTML = '<option value="">Select a campus first</option>';
+  serviceSelect.innerHTML = '<option value="">Select campus first, then choose a service</option>';
   
   if (selectedCampus && campusServices[selectedCampus]) {
-    // Enable service select
-    serviceSelect.disabled = false;
+    console.log('Loading services for campus:', selectedCampus);
+    console.log('Available services:', campusServices[selectedCampus]);
     
     // Add service options
     campusServices[selectedCampus].forEach(service => {
@@ -122,42 +145,52 @@ function updateServices() {
       option.value = service.name;
       option.textContent = service.name;
       serviceSelect.appendChild(option);
+      console.log('Added service option:', service.name);
     });
+    
+    console.log('Services loaded successfully. Total options:', serviceSelect.options.length);
   } else {
-    // Disable service select
-    serviceSelect.disabled = true;
+    console.log('No campus selected or no services found for campus:', selectedCampus);
   }
 }
 
-// Initialize star rating system (10 stars: 0.5 to 5.0)
+// Initialize star rating system (5 stars: 1 to 5)
 function initializeStarRating() {
+  console.log('Initializing star rating system');
+  
   const stars = document.querySelectorAll('.star');
   const ratingInput = document.getElementById('ratingInput');
   const ratingValue = document.getElementById('ratingValue');
-  const starDisplays = document.querySelectorAll('.star-display');
+
+  console.log('Found stars:', stars.length);
+  console.log('Rating input:', !!ratingInput);
+  console.log('Rating value:', !!ratingValue);
 
   let currentRating = 0;
 
-  stars.forEach((star) => {
-    const rating = parseFloat(star.dataset.rating);
+  stars.forEach((star, index) => {
+    const starRating = index + 1; // 1, 2, 3, 4, 5
     
     // Click event
     star.addEventListener('click', () => {
-      currentRating = rating;
-      updateStarDisplay(rating);
-      ratingInput.value = rating;
-      ratingValue.textContent = rating.toFixed(1);
+      currentRating = starRating;
+      updateStarDisplay(currentRating);
+      if (ratingInput) ratingInput.value = currentRating;
+      if (ratingValue) ratingValue.textContent = currentRating;
+      console.log('Star clicked, rating set to:', currentRating);
     });
 
     // Hover events for preview
     star.addEventListener('mouseenter', () => {
-      updateStarDisplay(rating, true);
+      updateStarDisplay(starRating, true);
     });
 
     star.addEventListener('mouseleave', () => {
       updateStarDisplay(currentRating, false);
     });
   });
+  
+  console.log('Star rating system initialized');
 }
 
 // Update star display
@@ -168,23 +201,20 @@ function updateStarDisplay(rating, isPreview = false) {
   // Update display stars (5 stars)
   starDisplays.forEach((star, index) => {
     const starNumber = index + 1; // 1, 2, 3, 4, 5
-    star.classList.remove('active', 'half-active');
+    star.classList.remove('active');
 
     if (rating >= starNumber) {
       // Full star
       star.classList.add('active');
-    } else if (rating >= starNumber - 0.5) {
-      // Half star
-      star.classList.add('half-active');
     }
   });
 
-  // Update input stars (10 stars)
-  stars.forEach((star) => {
-    const starRating = parseFloat(star.dataset.rating);
+  // Update input stars (5 stars)
+  stars.forEach((star, index) => {
+    const starNumber = index + 1; // 1, 2, 3, 4, 5
     star.classList.remove('active');
     
-    if (rating >= starRating) {
+    if (rating >= starNumber) {
       star.classList.add('active');
     }
   });
@@ -192,17 +222,16 @@ function updateStarDisplay(rating, isPreview = false) {
   // Update display text
   const ratingValue = document.getElementById('ratingValue');
   if (!isPreview && ratingValue) {
-    ratingValue.textContent = rating.toFixed(1);
+    ratingValue.textContent = rating;
   }
 }
 
 // Get star display string for ratings
 function getStarDisplay(rating) {
   const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  const emptyStars = 5 - fullStars;
 
-  return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+  return '★'.repeat(fullStars) + '☆'.repeat(emptyStars);
 }
 
 // Handle form submission
@@ -210,10 +239,12 @@ async function handleFormSubmit(event) {
   event.preventDefault();
   
   const formData = new FormData(event.target);
-  const rating = parseFloat(formData.get('rating'));
+  const rating = parseInt(formData.get('rating'));
   const campus = formData.get('campus');
   const service = formData.get('service');
   const comment = formData.get('comment');
+
+  console.log('Form submission:', { campus, service, rating, comment });
 
   // Validation
   if (!campus || !service) {
@@ -221,8 +252,8 @@ async function handleFormSubmit(event) {
     return;
   }
 
-  if (!rating || rating < 0.5 || rating > 5) {
-    showMessage('Please provide a valid rating between 0.5 and 5.0.', 'error');
+  if (!rating || rating < 1 || rating > 5) {
+    showMessage('Please provide a valid rating between 1 and 5.', 'error');
     return;
   }
 
@@ -268,7 +299,9 @@ function loadRecentRatings() {
       displayRatings(ratings);
     }, (error) => {
       console.error('Error loading ratings:', error);
-      elements.ratingsList.innerHTML = '<li class="rating-item error">Error loading recent reviews.</li>';
+      if (elements.ratingsList) {
+        elements.ratingsList.innerHTML = '<li class="rating-item error">Error loading recent reviews.</li>';
+      }
     });
   } catch (error) {
     console.error('Error setting up ratings listener:', error);
@@ -277,6 +310,11 @@ function loadRecentRatings() {
 
 // Display ratings in the list
 function displayRatings(ratings) {
+  if (!elements.ratingsList) {
+    console.error('Ratings list element not found');
+    return;
+  }
+  
   if (ratings.length === 0) {
     elements.ratingsList.innerHTML = '<li class="rating-item">No reviews yet. Be the first to rate a service!</li>';
     return;
@@ -293,24 +331,30 @@ function displayRatings(ratings) {
           <span class="rating-service">${rating.service} (${rating.campus})</span>
           <span class="rating-date">${formattedDate}</span>
         </div>
-        <div class="rating-stars">${starDisplay} ${rating.rating.toFixed(1)}</div>
+        <div class="rating-stars">${starDisplay} ${rating.rating}</div>
         <div class="rating-comment">${rating.comment}</div>
       </li>
     `;
   }).join('');
 }
 
-// Initialize the application
-function initializeApp() {
+// Initialize the NWU application
+function initializeNWUApp() {
   console.log('Initializing NWU Services App...');
 
   // Add event listeners
   if (elements.campusSelect) {
     elements.campusSelect.addEventListener('change', updateServices);
+    console.log('Campus select event listener added');
+  } else {
+    console.error('Campus select element not found!');
   }
 
   if (elements.ratingForm) {
     elements.ratingForm.addEventListener('submit', handleFormSubmit);
+    console.log('Rating form event listener added');
+  } else {
+    console.error('Rating form element not found!');
   }
 
   if (elements.homeBtn) {
@@ -330,7 +374,7 @@ function initializeApp() {
 
 // Wait for DOM to be ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
+  document.addEventListener('DOMContentLoaded', initializeNWUApp);
 } else {
-  initializeApp();
+  initializeNWUApp();
 }
